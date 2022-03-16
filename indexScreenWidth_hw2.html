@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Screen info</title>
+</head>
+<body>
+    <style>
+        *{
+            font-size: 32px;
+            font-family: sans-serif;
+        }
+        .ScreenInfoBtn{
+            width: 200px;
+            height: 100px;
+            margin: 0 auto;
+            margin-top: 20px;
+            display: block;
+            background-color: rgb(131, 123, 123);
+            border: none;
+            transition-duration: 0.2s;
+        }
+        .ScreenInfoBtn:hover{
+            transform: scale(1.2);
+            cursor: pointer;
+        }
+    </style>
+    <button id="screenInfo" class="ScreenInfoBtn">Screen info</button>
+
+    <script>
+        const ScreenInfo = document.querySelector('#screenInfo');
+
+        ScreenInfo.addEventListener('click', () => {
+            screenWidth = window.screen.width;
+            screenHeight = window.screen.height;
+
+            alert(`Screen-Width: ${screenWidth}  Screen-Height: ${screenHeight}`);
+        })
+    </script>
+</body>
+</html>

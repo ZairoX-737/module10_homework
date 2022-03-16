@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+</head>
+<body>
+    <style>
+        *{
+            font-family: sans-serif;
+        }
+        .chatContainer{
+            width: 420px;
+            min-height: 350px;
+            border: 1px black solid;
+            border-radius: 10px;
+            margin: 0 auto;
+            margin-top: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px;
+        }
+        .chatBtnContainer{
+            display: flex;
+            justify-content: space-between;
+        }
+        .input{
+            width: 190px;
+            height: 28px;
+            border: 3px #b4d2e8 solid; 
+        }
+        .button{
+            background: #b4d2e8;
+            border: none;
+            width: 100px;
+            height: 35px;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+        .button:hover{
+            transform: scale(1.05);
+        }
+
+        .chatRequestContainer{
+            width: 404px;
+            min-height: 285px;
+            border: 3px #b4d2e8 solid; 
+            display: flex;
+            flex-direction: column;
+            padding: 5px;
+            margin-top: 20px;
+        }
+        .chatMessage{
+            font-size: 14px;
+            font-weight: bold;
+            max-width: 200px;
+            word-wrap: break-word;
+            border: #b4d2e8 3px solid;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            padding: 10px 15px;
+        }
+        .messageR{
+            align-self: flex-end;
+        }
+        .GeoLoc{
+            text-decoration: none;
+        }
+        .error{
+            color: red;
+            text-transform: uppercase;
+        }
+        
+    </style>
+    <div class="chatContainer">
+        <div class="chatContainer_item chatBtnContainer">
+            <div>
+                <input id="chatInput" class="input" placeholder="Введите текст сообщения" /></div>
+            <div>
+                <button id="sendBtn" class="button">Отправить</button>
+                <button id="geoBtn" class="button">Геолокация</button>
+            </div>
+        </div>
+
+        <div id='outputContainer' class="chatContainer_item chatRequestContainer">
+            <!-- <div class="chatMessage messageR">Сообщение отправителяОТПРАВИТЕЛЯОТПРАВИТЕЛЯОТПРАВИТЕЛЯОТПРАВИТЕЛЯ</div>
+            <div class="chatMessage">Сообщение от сервера</div>
+            <div class="chatMessage messageR"><a href="https://www.openstreetmap.org/" class="GeoLoc">Гео-локация</a></div> -->
+        </div>
+    </div>
+
+    <script>
+        wsUri = 'wss://ws.ifelse.io';
+        const sendBtn = document.querySelector('#sendBtn');
+        const geoBtn = document.querySelector('#geoBtn');
+        const output = document.querySelector('#outputContainer');
+        let websocket;
+
+        function writeToScreen(message){
+            let mes = document.createElement('div');
+            mes.className = "chatMessage messageR";
+            mes.innerHTML = message;
+            output.appendChild(mes);
+        }
+        function writeToScreenL(message){
+            let mes = document.createElement('div');
+            mes.className = "chatMessage";
+            mes.innerHTML = message;
+            output.appendChild(mes);
+        }
+
+        sendBtn.addEventListener ('click', () => {
+            websocket = new WebSocket(wsUri);
+            let inputValue = document.querySelector('input').value;
+            const message = inputValue;
+            writeToScreen(message);
+            async () => {
+             websocket.send(message);
+             console.log('Get echo');
+            }
+            websocket.onmessage = function(evt) {
+                console.log(evt)
+                writeToScreenL( 
+                   evt.data
+                );
+            };
+        })
+
+        const error = () => {
+            console.log("Cant get your geoposition");
+            let mes = document.createElement('div');
+            mes.className = "chatMessage messageR error";
+            mes.innerHTML = 'ERROR';
+            output.appendChild(mes); 
+        }
+
+        const success = (position) => {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+
+            let mes = document.createElement('a');
+            mes.className = "chatMessage messageR GeoLoc";
+            mes.href = `https://www.openstreetmap.org/#map=18/${latitude}/${longitude}`
+            console.log(mes);
+            mes.innerHTML = 'Гео-локация';
+            output.appendChild(mes);
+        }
+
+        geoBtn.addEventListener('click', () => {
+            if(!navigator.geolocation){
+                error();
+            } else{
+                navigator.geolocation.getCurrentPosition(success, error);
+            }
+            
+        })
+    </script>
+</body>
+</html>
